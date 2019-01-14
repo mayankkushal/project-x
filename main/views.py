@@ -10,11 +10,11 @@ import tensorflow as tf
 from keras.models import load_model
 import pickle
 
-# model = load_model('my_model.h5')
-# print('Model Loaded...')
+model = load_model('my_model.h5')
+print('Model Loaded...')
 
-with open('models/sentiment/my_model.h5', 'rb') as m:
-    model = pickle.load(m)
+# with open('models/sentiment/my_model.h5', 'rb') as m:
+#     model = pickle.load(m)
 
 max_review_length = 500
 
