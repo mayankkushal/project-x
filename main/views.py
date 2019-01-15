@@ -32,11 +32,11 @@ class SentimentAnalysisView(APIView):
     def get(self, request, format=None):
         return Response({"details": "Welcome to sentiment analysis! Project-X"})
 
-    def dispatch(self, request, *args, **kwargs):
+    def initial(self, request, *args, **kwargs):
         if not settings.DEBUG:
-            if request.META.get('HTTP_HOST') not in settings.WHITELIST_HOSTS.split(','):
+            if not settings.PRIVATE_KEY==request.data['PRIVATE_KEY']:
                 raise PermissionDenied("Not Allowed")
-        return super(SentimentAnalysisView, self).dispatch(request, *args, **kwargs)
+        super(SentimentAnalysisView, self).initial(request, *args, **kwargs)
 
     def _predict(self):
         """
