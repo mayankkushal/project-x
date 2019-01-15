@@ -4,44 +4,60 @@ from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
-
 from keras.preprocessing import sequence
 import tensorflow as tf
 from keras.models import load_model
 import pickle
 
-# model = load_model('my_model.h5')
-# print('Model Loaded...')
-
-# with open('models/sentiment/my_model.h5', 'rb') as m:
-#     model = pickle.load(m)
-
 from sklearn.externals import joblib
-model = joblib.load('models/sentiment/_model.pkl')
+# model = joblib.load('models/sentiment/_model.pkl')
 
 max_review_length = 500
+graph = tf.get_default_graph()
 
 # loading tokenizer
 with open('models/sentiment/tokenizer.pickle', 'rb') as handle:
     tokenizer = pickle.load(handle)
-    print("tokenizer loaded...")
-graph = tf.get_default_graph()
 
+
+def _load_model():
+    """
+        Project specific -> returns the loaded model
+    """
+    return joblib.load('models/sentiment/_model.pkl')
+
+model = _load_model()
 
 class SentimentAnalysisView(APIView):
     def get(self, request, format=None):
         return Response({"details": "Welcome to sentiment analysis! Project-X"})
 
+    def _predict(self):
+        """
+            Prediction logic goes here.
+        """
+        self.text = tokenizer.texts_to_sequences([self.text])
+        self.text = sequence.pad_sequences(self.text, maxlen=max_review_length)
+        global graph
+        with graph.as_default():
+            predict = model.predict(self.text)
+            return predict
+
+    def _get_response(self):
+        """
+            Converts the prediction into a dict which can directly be passed
+            as response.
+            `Returns dict()`
+        """
+        prediction = self._predict()
+        return {'score':str(prediction[0][0])}
+
+
     def post(self, request, format=None):
         """
             `text`: text that needs to analyzed
         """
-        text = request.data.get('text')
-        if text:
-            text = tokenizer.texts_to_sequences([text])
-            text = sequence.pad_sequences(text, maxlen=max_review_length)
-            global graph
-            with graph.as_default():
-                predict = model.predict(text)      
-                return Response({'score':str(predict[0][0])}, status=status.HTTP_201_CREATED)
+        self.text = request.data.get('text')
+        if self.text: 
+            return Response(self._get_response(), status=status.HTTP_201_CREATED)
         return Response({'details': "text not found"}, status=status.HTTP_400_BAD_REQUEST)
