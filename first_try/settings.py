@@ -16,7 +16,8 @@ import dj_database_url
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
+from dotenv import load_dotenv
+load_dotenv()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -24,9 +25,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '#+wwy)6@l7nv6kjjpr#9wp&nye!j(np1l(stuk=$v(2!2!y!&='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False if not os.getenv('DEBUG') else True
 
 ALLOWED_HOSTS = ['*', '.herokuapp.com']
+
+WHITELIST_IPS = os.getenv('WHITELIST_IPS')
 
 # Application definition
 

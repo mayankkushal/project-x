@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -31,6 +31,12 @@ model = _load_model()
 class SentimentAnalysisView(APIView):
     def get(self, request, format=None):
         return Response({"details": "Welcome to sentiment analysis! Project-X"})
+
+    def dispatch(self, request, *args, **kwargs):
+        if not settings.DEBUG:
+            if request.META.get('HTTP_X_FORWARDED_FOR') not in settings.WHITELIST_IPS.split(','):
+                raise PermissionDenied("Not Allowed")
+        return super(SentimentAnalysisView, self).dispatch(request, *args, **kwargs)
 
     def _predict(self):
         """
