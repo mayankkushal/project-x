@@ -34,7 +34,7 @@ class SentimentAnalysisView(APIView):
 
     def dispatch(self, request, *args, **kwargs):
         if not settings.DEBUG:
-            if request.META.get('HTTP_X_FORWARDED_FOR') not in settings.WHITELIST_IPS.split(','):
+            if request.META.get('HTTP_HOST') not in settings.WHITELIST_HOSTS.split(','):
                 raise PermissionDenied("Not Allowed")
         return super(SentimentAnalysisView, self).dispatch(request, *args, **kwargs)
 

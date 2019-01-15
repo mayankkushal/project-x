@@ -29,7 +29,7 @@ DEBUG = False if not os.getenv('DEBUG') else True
 
 ALLOWED_HOSTS = ['*', '.herokuapp.com']
 
-WHITELIST_IPS = os.getenv('WHITELIST_IPS')
+WHITELIST_HOSTS = os.getenv('WHITELIST_HOSTS')
 
 # Application definition
 
